@@ -1,0 +1,11 @@
+name: KitCreator
+version: ${project.version}
+main: me.hsgamer.kitcreator.KitCreator
+api-version: 1.13
+depend: [ServerControlReloaded]
+
+commands:
+  kitcreator:
+    aliases: [kc]
+    description: Kit Creator
+    permission: kitcreator.use
