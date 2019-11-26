@@ -144,8 +144,14 @@ public final class KitCreator extends JavaPlugin {
               sender.sendMessage(ChatColor.RED + "That kit is already available");
             } else {
               try {
-                createKit(args[1], getItems((Player) sender));
-                sender.sendMessage(ChatColor.GREEN + "Success!");
+                List<ItemStack> items = getItems((Player) sender);
+                if (!items.isEmpty()) {
+                  createKit(args[1], items);
+                  setCooldown(args[1], 0);
+                  sender.sendMessage(ChatColor.GREEN + "Success!");
+                } else {
+                  sender.sendMessage(ChatColor.RED + "You need items in your inventory to do this");
+                }
               } catch (IOException e) {
                 sender.sendMessage(ChatColor.RED + "Failed! Check the console");
                 getLogger().log(Level.WARNING, "Error when creating kit", e);
