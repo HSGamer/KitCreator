@@ -6,7 +6,9 @@ import Utils.XMaterial;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -19,11 +21,43 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class KitCreator extends JavaPlugin {
+
+  private static Map<String, String> enchantments = new HashMap<>();
+
+  static {
+    addEnchantment("SHARPNESS", "DAMAGE_ALL");
+    addEnchantment("FIRE", "ARROW_FIRE");
+    addEnchantment("INFINITY", "ARROW_INFINITE");
+    addEnchantment("FIREASPECT", "FIRE_ASPECT");
+    addEnchantment("RESPIRATION", "OXYGEN");
+    addEnchantment("LOOTING", "LOOT_BONUS_MOBS");
+    addEnchantment("FORTUNE", "LOOT_BONUS_BLOCKS");
+    addEnchantment("UNBREAKING", "DURABILITY");
+    addEnchantment("AQUA_AFFINITY", "WATER_WORKER");
+    addEnchantment("PROTECTION", "PROTECTION_ENVIRONMENTAL");
+    addEnchantment("BLAST_PROTECTION", "PROTECTION_EXPLOSIONS");
+    addEnchantment("FEATHER_FALLING", "PROTECTION_FALL");
+    addEnchantment("FIRE_PROTECTION", "PROTECTION_FIRE");
+    addEnchantment("PROJECTILE_PROTECTION", "PROTECTION_PROJECTILE");
+    addEnchantment("CURSE_OF_VANISHING", "VANISHING_CURSE");
+    addEnchantment("CURSE_OF_BINDING", "BINDING_CURSE");
+    addEnchantment("SMITE", "DAMAGE_UNDEAD");
+    addEnchantment("POWER", "ARROW_DAMAGE");
+    addEnchantment("BANE_OF_ARTHROPODS", "DAMAGE_ARTHROPODS");
+    addEnchantment("EFFICIENCY", "DIG_SPEED");
+    addEnchantment("PUNCH", "ARROW_KNOCKBACK");
+  }
+
   private File kitFile;
+
+  private static void addEnchantment(String enchantment, String original) {
+    enchantments.put(original, enchantment);
+  }
 
   @Override
   public void onEnable() {
-    getServer().getConsoleSender().sendMessage(Loader.getInstance.getDataFolder().getAbsolutePath() + "/Kits.yml");
+    getServer().getConsoleSender()
+        .sendMessage(Loader.getInstance.getDataFolder().getAbsolutePath() + "/Kits.yml");
     this.kitFile = new File(Loader.getInstance.getDataFolder().getAbsolutePath() + "/Kits.yml");
     getServer().getPluginCommand("kitcreator").setExecutor(this);
     ServerControl.API.hookAddon(this);
@@ -37,7 +71,9 @@ public final class KitCreator extends JavaPlugin {
   private List<ItemStack> getItems(Player player) {
     List<ItemStack> list = new ArrayList<>();
     for (ItemStack item : player.getInventory().getContents()) {
-      if (item != null && !item.getType().equals(Material.AIR)) { list.add(item); }
+      if (item != null && !item.getType().equals(Material.AIR)) {
+        list.add(item);
+      }
     }
     return list;
   }
@@ -45,16 +81,23 @@ public final class KitCreator extends JavaPlugin {
   private void createKit(String name, List<ItemStack> items) throws IOException {
     FileConfiguration kitConfig = Loader.kit;
     for (ItemStack item : items) {
-      String material = XMaterial.matchXMaterial(item) != null ? XMaterial.matchXMaterial(item).name() : item.getType().name();
+      String material =
+          XMaterial.matchXMaterial(item) != null ? XMaterial.matchXMaterial(item).name()
+              : item.getType().name();
       kitConfig.set("Kits." + name + ".Items." + material + ".Amount", item.getAmount());
       if (item.hasItemMeta()) {
         ItemMeta meta = item.getItemMeta();
         if (meta.hasDisplayName()) {
-          kitConfig.set("Kits." + name + ".Items." + material + ".CustomName", meta.getDisplayName());
+          kitConfig
+              .set("Kits." + name + ".Items." + material + ".CustomName", meta.getDisplayName());
         }
         if (meta.hasEnchants()) {
           List<String> parsedEnchants = new ArrayList<>();
-          meta.getEnchants().forEach(((enchantment, integer) -> parsedEnchants.add(enchantment.getName() + ":" + integer)));
+          meta.getEnchants().forEach((enchantment, integer) -> {
+            String enchant = enchantment.getName();
+            parsedEnchants.add(enchantments.containsKey(enchant) ? enchantments.get(enchant)
+                : enchant + ":" + integer);
+          });
           kitConfig.set("Kits." + name + ".Items." + material + ".Enchantments", parsedEnchants);
         }
         if (meta.hasLore()) {
