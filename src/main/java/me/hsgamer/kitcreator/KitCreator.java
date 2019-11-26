@@ -95,8 +95,7 @@ public final class KitCreator extends JavaPlugin {
           List<String> parsedEnchants = new ArrayList<>();
           meta.getEnchants().forEach((enchantment, integer) -> {
             String enchant = enchantment.getName();
-            parsedEnchants.add(enchantments.containsKey(enchant) ? enchantments.get(enchant)
-                : enchant + ":" + integer);
+            parsedEnchants.add(enchantments.getOrDefault(enchant, enchant) + ":" + integer);
           });
           kitConfig.set("Kits." + name + ".Items." + material + ".Enchantments", parsedEnchants);
         }
