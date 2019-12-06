@@ -45,6 +45,7 @@ public final class KitCreator extends JavaPlugin {
     return list;
   }
 
+  @SuppressWarnings("deprecated")
   private void createKit(String name, List<ItemStack> items) throws IOException {
     FileConfiguration kitConfig = Loader.kit;
     for (ItemStack item : items) {
@@ -60,9 +61,7 @@ public final class KitCreator extends JavaPlugin {
         }
         if (meta.hasEnchants()) {
           List<String> parsedEnchants = new ArrayList<>();
-          meta.getEnchants().forEach((enchantment, integer) -> {
-            parsedEnchants.add(enchantment.getName() + ":" + integer);
-          });
+          meta.getEnchants().forEach((enchantment, integer) -> parsedEnchants.add(enchantment.getName() + ":" + integer));
           kitConfig.set("Kits." + name + ".Items." + material + ".Enchantments", parsedEnchants);
         }
         if (meta.hasLore()) {
